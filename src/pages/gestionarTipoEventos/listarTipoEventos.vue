@@ -5,7 +5,7 @@
         <q-btn
           label="Agregar Tipo de Evento"
           color="primary"
-          @click="agregarEvento = true"
+          @click="openAgregarEvento()"
         />
       </div>
 
@@ -15,6 +15,7 @@
         :columns="columns"
         row-key="name"
         :loading="listaTipoEventos.length == 0"
+        rows-per-page-label="10"
       >
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
@@ -82,60 +83,6 @@
     </div>
   </div>
 
-  <q-dialog v-model="visualizarDetalle" full-width>
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">{{ informacionEvento.name }}</div>
-      </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        <div class="row justify-around">
-          <div class="col-8">
-            {{ informacionEvento.description }}
-          </div>
-          <div class="col-2">
-            <img :src="informacionEvento.icon" alt="" width="300" />
-          </div>
-        </div>
-      </q-card-section>
-
-      <q-card-section
-        v-if="informacionEvento.photos && informacionEvento.photos.length > 0"
-      >
-        <div class="text-h6">Fotografias</div>
-        <div class="q-pa-md">
-          <q-carousel
-            v-model="slide"
-            transition-prev="scale"
-            transition-next="scale"
-            swipeable
-            animated
-            control-color="primary"
-            navigation
-            padding
-            arrows
-            height="300px"
-          >
-            <q-carousel-slide
-              :name="photo"
-              class="column no-wrap flex-center"
-              v-for="photo in informacionEvento.photos"
-              :key="photo"
-            >
-              <div class="q-mt-md text-center">
-                <img :src="photo" alt="" />
-              </div>
-            </q-carousel-slide>
-          </q-carousel>
-        </div>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat label="OK" color="primary" v-close-popup />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-
   <q-dialog v-model="actualizarEvento" full-width>
     <q-card>
       <q-card-section>
@@ -149,28 +96,42 @@
               v-model="informacionEvento.name"
               label="Nombre Evento"
             />
+            <div class="q-mt-md">
+              <div class="text-h6">Descripcion</div>
+              <div class="row">
+                <div class="col">
+                  <div>
+                    <q-input
+                      v-model="informacionEvento.description"
+                      outlined
+                      type="textarea"
+                      autogrow
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-5">
+          <div class="col-4">
+            <div class="text-h5">Icono</div>
+            <div
+              v-if="informacionEvento.icon"
+              class="text-center relative-position"
+            >
+              <q-btn
+                icon="close"
+                round
+                class="absolute-top-right q-mr-lg"
+                color="negative"
+              />
+              <q-img :src="informacionEvento.icon" :ratio="1" width="50%" />
+            </div>
+
             <q-uploader
-              url="http://localhost:4444/upload"
+              v-else
               hide-upload-btn
               label="Icono del tipo de Evento"
             />
-          </div>
-        </div>
-        <div class="q-mt-md">
-          <div class="text-h6">Descripcion</div>
-          <div class="row">
-            <div class="col">
-              <div>
-                <q-input
-                  v-model="informacionEvento.description"
-                  outlined
-                  type="textarea"
-                  autogrow
-                />
-              </div>
-            </div>
           </div>
         </div>
       </q-card-section>
@@ -188,64 +149,12 @@
       </q-card-section>
     </q-card>
   </q-dialog>
-
-  <q-dialog v-model="agregarEvento" full-width>
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">Agregar Tipo Evento</div>
-      </q-card-section>
-      <q-card-section>
-        <div class="row justify-between">
-          <div class="col-5">
-            <q-input
-              outlined
-              v-model="nuevoTipoEvento.name"
-              label="Nombre Evento"
-            />
-          </div>
-          <!-- <div class="col-5">
-            <q-uploader
-              url="http://localhost:4444/upload"
-              hide-upload-btn
-              label="Icono del tipo de Evento"
-            />
-          </div> -->
-        </div>
-        <div class="q-mt-md">
-          <div class="text-h6">Descripcion</div>
-          <div class="row">
-            <div class="col">
-              <div>
-                <q-input
-                  v-model="nuevoTipoEvento.description"
-                  outlined
-                  type="textarea"
-                  autogrow
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </q-card-section>
-      <q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="primary" v-close-popup />
-          <q-btn
-            flat
-            label="Agregar"
-            color="primary"
-            v-close-popup
-            @click="agregarTipoEvento(nuevoTipoEvento)"
-          />
-        </q-card-actions>
-      </q-card-section>
-    </q-card>
-  </q-dialog>
 </template>
 
 <script setup>
 import GestionarTipoEventosServices from "../../services/api/gestionarTipoEventosServices";
 import ModalVerEventos from "./modalVerEventos.vue";
+import AgregarTipoEventoModal from "./AgregarTipoEventosModal.vue";
 import { useQuasar } from "quasar";
 import { ref, reactive } from "vue";
 
@@ -261,7 +170,10 @@ const nuevoTipoEvento = reactive({
   description: null,
 });
 
-const agregarEvento = ref(false);
+const addFile = async (event) => {
+  nuevoTipoEvento.icon = event[0];
+  console.log(event);
+};
 
 const columns = [
   {
@@ -344,23 +256,28 @@ const openVisualizarDetalle = (propEvento) => {
       informacionEvento: informacionEvento.value,
       primeraImagen: informacionEvento.value.photos[0],
     },
-  })
-    .onOk(() => {
-      // console.log('OK')
-    })
-    .onCancel(() => {
-      // console.log('Cancel')
-    })
-    .onDismiss(() => {
-      // console.log('I am triggered on both OK and Cancel')
-    });
-  // visualizarDetalle.value = true;
-  // slide.value = propEvento.row.photos[0];
+  });
+};
+
+const openAgregarEvento = () => {
+  $q.dialog({
+    component: AgregarTipoEventoModal,
+  }).onOk((eventTypeData) => {
+    listaTipoEventos.value.push(eventTypeData);
+  });
 };
 
 const openActualizarEvento = (propEvento) => {
-  informacionEvento.value = { ...propEvento.row };
   actualizarEvento.value = true;
+  informacionEvento.value = { ...propEvento.row };
+  fetch("https://i.imgur.com/gDJ1JhL.jpeg")
+    .then((response) => response.blob())
+    .then((blob) => {
+      informacionEvento.value.iconBlob = blob;
+      console.log(blob);
+      // const url = URL.createObjectURL(blob);
+      // console.log(URL.createObjectURL(informacionEvento.value.icon), blob);
+    });
 };
 
 const actualizarEventoData = (informacionEvento) => {
@@ -369,9 +286,20 @@ const actualizarEventoData = (informacionEvento) => {
 
 const agregarTipoEvento = (informacionEvento) => {
   console.log(informacionEvento);
-  GestionarTipoEventosServices.addEventType(informacionEvento).then((res) => {
-    listaTipoEventos.value.push(res.data);
-  });
+  const formAgregarTipoEvento = new FormData();
+  formAgregarTipoEvento.append("name", informacionEvento.name);
+  formAgregarTipoEvento.append("description", informacionEvento.description);
+  formAgregarTipoEvento.append("icon", informacionEvento.icon);
+  formAgregarTipoEvento.append("icon", informacionEvento.icon);
+  formAgregarTipoEvento.append("photos", informacionEvento.icon);
+  formAgregarTipoEvento.append("videos", informacionEvento.icon);
+
+  console.log(formAgregarTipoEvento);
+  GestionarTipoEventosServices.addEventType(formAgregarTipoEvento).then(
+    (res) => {
+      listaTipoEventos.value.push(res.data);
+    }
+  );
 };
 
 getData();
