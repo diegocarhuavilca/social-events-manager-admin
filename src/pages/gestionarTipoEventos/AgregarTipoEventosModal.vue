@@ -91,8 +91,8 @@ const informacionNuevoTipoEvento = reactive({
   name: null,
   description: null,
   icon: null,
-  photos: [],
-  videos: [],
+  photos: null,
+  videos: null,
 });
 
 const colorsUploader = reactive({
@@ -110,7 +110,7 @@ const handlerIcono = (event) => {
   informacionNuevoTipoEvento.icon = event;
 };
 
-const agregarTipoEvento = () => {
+const agregarTipoEvento = async () => {
   if (!informacionNuevoTipoEvento.icon) {
     colorsUploader.icon = "negative";
     $q.notify({
@@ -133,6 +133,7 @@ const agregarTipoEvento = () => {
     });
     return;
   }
+  console.log(informacionNuevoTipoEvento);
   loading.value = true;
   const formAgregarTipoEvento = new FormData();
   formAgregarTipoEvento.append("name", informacionNuevoTipoEvento.name);
@@ -141,9 +142,12 @@ const agregarTipoEvento = () => {
     informacionNuevoTipoEvento.description
   );
   formAgregarTipoEvento.append("icon", informacionNuevoTipoEvento.icon);
-  formAgregarTipoEvento.append("icon", informacionNuevoTipoEvento.icon);
-  formAgregarTipoEvento.append("photos", informacionNuevoTipoEvento.icon);
+  informacionNuevoTipoEvento.photos.forEach((element) => {
+    formAgregarTipoEvento.append("photos", element);
+  });
   formAgregarTipoEvento.append("videos", informacionNuevoTipoEvento.icon);
+
+  await console.log(formAgregarTipoEvento.getAll("photos"));
 
   GestionarTipoEventosServices.addEventType(formAgregarTipoEvento)
     .then((res) => {
@@ -154,6 +158,9 @@ const agregarTipoEvento = () => {
         icon: "check",
       });
       onDialogOK(res.data);
+    })
+    .catch((err) => {
+      console.log(err, formAgregarTipoEvento);
     })
     .finally(() => (loading.value = false));
 };

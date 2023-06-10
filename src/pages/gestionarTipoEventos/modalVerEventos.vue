@@ -15,7 +15,6 @@
           </div>
         </div>
       </q-card-section>
-
       <q-card-section
         v-if="informacionEvento.photos && informacionEvento.photos.length > 0"
       >
