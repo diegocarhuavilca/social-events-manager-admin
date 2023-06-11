@@ -5,7 +5,7 @@
         <q-btn
           label="Agregar Local"
           color="primary"
-          @click="openAgregarEvento()"
+          @click="openAgregarLocal()"
         />
       </div>
 
@@ -67,6 +67,7 @@
 
 <script setup>
 import gestionarLocalesService from "src/services/api/gestionarLocales";
+import agregarLocalModal from "./agregarLocalModal.vue";
 import verModalLocal from "pages/gestionarLocales/verLocalModal";
 import { useQuasar } from "quasar";
 import { ref } from "vue";
@@ -150,6 +151,14 @@ function deleteLocal(informacionLocal) {
     .onCancel(() => {
       // console.log('Cancel')
     });
+}
+
+function openAgregarLocal() {
+  $q.dialog({
+    component: agregarLocalModal,
+  }).onOk((eventTypeData) => {
+    listaLocales.value.push(eventTypeData);
+  });
 }
 </script>
 
