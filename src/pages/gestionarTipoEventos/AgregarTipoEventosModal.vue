@@ -133,7 +133,6 @@ const agregarTipoEvento = async () => {
     });
     return;
   }
-  console.log(informacionNuevoTipoEvento);
   loading.value = true;
   const formAgregarTipoEvento = new FormData();
   formAgregarTipoEvento.append("name", informacionNuevoTipoEvento.name);
@@ -146,8 +145,6 @@ const agregarTipoEvento = async () => {
     formAgregarTipoEvento.append("photos", element);
   });
   formAgregarTipoEvento.append("videos", informacionNuevoTipoEvento.icon);
-
-  await console.log(formAgregarTipoEvento.getAll("photos"));
 
   GestionarTipoEventosServices.addEventType(formAgregarTipoEvento)
     .then((res) => {

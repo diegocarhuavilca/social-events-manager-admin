@@ -9,6 +9,10 @@ const routes = [
         component: () =>
           import("pages/gestionarTipoEventos/listarTipoEventos.vue"),
       },
+      {
+        path: "gestionar-locales",
+        component: () => import("pages/gestionarLocales/listarLocales.vue"),
+      },
     ],
   },
 

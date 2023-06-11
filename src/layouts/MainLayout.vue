@@ -17,6 +17,12 @@
             </q-item-section>
             <q-item-section> Gestionar Tipo Eventos </q-item-section>
           </q-item>
+          <q-item clickable v-ripple @click="$router.push('gestionar-locales')">
+            <q-item-section avatar>
+              <q-icon name="storefront" color="primary" />
+            </q-item-section>
+            <q-item-section> Gestionar Locales </q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
     </q-drawer>
