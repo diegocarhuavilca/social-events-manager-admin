@@ -15,6 +15,10 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/proforma",
+    component: () => import("pages/GenerarProforma.vue"),
+  },
 
   // Always leave this as last one,
   // but you can also remove it

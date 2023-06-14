@@ -46,6 +46,18 @@
           </q-td>
         </template>
 
+        <template v-slot:body-cell-active="props">
+          <q-td :props="props">
+            <q-icon
+              name="check"
+              size="md"
+              color="primary"
+              v-if="props.row.active"
+            />
+            <q-icon name="error" size="md" color="accent" v-else />
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-photos="props">
           <q-td :props="props">
             <q-icon
@@ -106,6 +118,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "active",
+    align: "center",
+    label: "Activo",
+    field: "active",
+    sortable: true,
+  },
+  {
     name: "photos",
     align: "center",
     label: "Tiene Fotos",
@@ -130,6 +149,8 @@ function openDetalleLocales(informacionLocal) {
         ? informacionLocal.row.secondaryPhotos[0]
         : [],
     },
+  }).onOk((event) => {
+    console.log(event);
   });
 }
 

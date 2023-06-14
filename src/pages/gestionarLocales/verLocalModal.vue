@@ -1,14 +1,15 @@
 <template>
-  <q-dialog full-width>
+  <q-dialog full-width ref="dialogRef" @hide="onDialogHide">
     <q-card>
       <q-card-section>
         <div class="row justify-between">
           <div class="text-h6">Informacion del local</div>
           <div>
             <q-toggle
-              v-model="activo"
+              v-model="infoLocal.active"
               color="green"
               :label="activo ? 'Local Activo' : 'Local Inactivo'"
+              @update:model-value="handleActive"
               left-label
             />
             <q-btn icon="close" flat color="primary" v-close-popup />
@@ -181,15 +182,8 @@
                         color="primary"
                         icon="visibility"
                         class="q-mr-sm"
-                        @click="openVisualizarDetalle(props)"
                       />
-                      <q-btn
-                        dense
-                        round
-                        color="accent"
-                        icon="delete"
-                        @click="deleteEventType(props.row)"
-                      />
+                      <q-btn dense round color="accent" icon="delete" />
                     </div>
                   </q-td>
                 </template>
@@ -255,8 +249,18 @@
 
 <script setup>
 import { defineProps, computed, ref, reactive } from "vue";
-import { useQuasar } from "quasar";
+import { useQuasar, useDialogPluginComponent } from "quasar";
 import agregarExtraLocal from "./agregarExtraLocal.vue";
+import gestionarLocales from "../../services/api/gestionarLocales";
+
+defineEmits([
+  // REQUIRED; need to specify some events that your
+  // component will emit through useDialogPluginComponent()
+  ...useDialogPluginComponent.emits,
+]);
+
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialogPluginComponent();
 
 const $q = useQuasar();
 const props = defineProps({
@@ -270,7 +274,7 @@ const activo = ref(false);
 
 const modificarActivo = ref(false);
 
-const infoLocal = reactive({ ...props.informacionLocal });
+const infoLocal = ref({ ...props.informacionLocal });
 
 const loading = computed(() => !props.informacionLocal);
 const fullscreen = ref(false);
@@ -311,6 +315,14 @@ const columns = [
   },
 ];
 
+const handleActive = (value, $event) => {
+  gestionarLocales
+    .updateStatus(props.informacionLocal.id, value)
+    .then((res) => {
+      infoLocal.value = { ...res.data };
+    });
+};
+
 function getSelectedString() {
   return selected.value.length === 0
     ? ""
@@ -320,14 +332,14 @@ function getSelectedString() {
 }
 
 function agregarExtra() {
-  console.log(props.informacionLocal);
   $q.dialog({
     component: agregarExtraLocal,
     componentProps: {
       informacionViaje: props.informacionLocal,
     },
   }).onOk((extraData) => {
-    infoLocal.extras.push(extraData);
+    onDialogOK(extraData);
+    infoLocal.value.extras = extraData;
   });
 }
 </script>

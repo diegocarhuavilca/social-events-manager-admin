@@ -15,6 +15,9 @@ const gestionarLocales = {
   createExtra: (idLocal, informacionExtra) => {
     return api.post(baseURL.concat("/", idLocal, "/extras"), informacionExtra);
   },
+  updateStatus: (idLocal, status) => {
+    return api.post(baseURL.concat(`/${idLocal}/status`), { active: status });
+  },
 };
 
 export default gestionarLocales;
